@@ -13,3 +13,26 @@ export function getAdministratorInfo() {
         method: "get"
     })
 }
+export function addAdministrator(data) {
+    return request({
+        url: "/administrator/add",
+        method: "post",
+        data
+    })
+}
+export function deleteAdministrator(data) {
+    return request({
+        url: "/administrator/delete",
+        method: "delete",
+        data
+    })
+}
+export function updateAdministrator(data) {
+    return request({
+        url: "/administrator/update",
+        method: "put",
+        data
+    })
+}
+
+

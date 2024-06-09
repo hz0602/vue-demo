@@ -5,10 +5,13 @@
         <div class="head">
             <el-row :gutter="20">
                 <el-col :span="6">
-                    <el-input v-model="userInfo.id" placeholder="请输入用户ID"></el-input>
+                    <el-input v-model="userInfo.a_id" placeholder="请输入管理员ID"></el-input>
                 </el-col>
                 <el-col :span="6">
-                    <el-input v-model="userInfo.permission" placeholder="请输入权限"></el-input>
+                    <el-input v-model="userInfo.a_name" placeholder="请输入姓名"></el-input>
+                </el-col>
+                <el-col :span="6">
+                    <el-input v-model="userInfo.a_password" placeholder="请输入密码"></el-input>
                 </el-col>
                 <el-col :span="6">
                     <el-button type="primary" @click="addUser" plain>增加</el-button>
@@ -20,13 +23,14 @@
             <el-table :data="tableData" style="width: 100%">
                 <el-table-column label="序号" width="180"><template slot-scope="scope"> {{ scope.$index + 1 }}
                     </template></el-table-column>
-                <el-table-column prop="id" label="管理员ID" width="180"></el-table-column>
-                <el-table-column prop="permission" label="权限"></el-table-column>
-                <el-table-column prop="birthday" label="操作">
+                <el-table-column prop="a_id" label="管理员ID" width="180"></el-table-column>
+                <el-table-column prop="a_name" label="姓名"></el-table-column>
+                <el-table-column prop="a_password" label="密码"></el-table-column>
+                <el-table-column label="操作">
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" @click="editUser(scope.row, scope.$index)"
                             circle></el-button>
-                        <el-button type="danger" icon="el-icon-delete" @click="delUser(scope.$index)"
+                        <el-button type="danger" icon="el-icon-delete" @click="delUser(scope.row, scope.$index)"
                             circle></el-button>
                     </template>
                 </el-table-column>
@@ -34,7 +38,7 @@
         </div>
 
         <div class="query-container" style="position: fixed; bottom: 20px; left: 20px;">
-            <el-input v-model="searchId" placeholder="请输入管理员ID进行查询" style="width: 200px;"></el-input>
+            <el-input v-model="searchId" placeholder="请输入管理员ID或者姓名进行查询" style="width: 300px;"></el-input>
             <el-button type="success" @click="searchUser" plain style="margin-left: 10px;">查询</el-button>
         </div>
 
@@ -42,8 +46,9 @@
         <el-dialog title="修改管理员信息" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
             <div>
                 <el-form ref="form" :model="editObj" label-width="80px">
-                    <el-form-item label="用户ID"><el-input v-model="editObj.id"></el-input></el-form-item>
-                    <el-form-item label="权限"><el-input v-model="editObj.permission"></el-input></el-form-item>
+                    <el-form-item label="用户ID"><el-input v-model="editObj.a_id"></el-input></el-form-item>
+                    <el-form-item label="姓名"><el-input v-model="editObj.a_name"></el-input></el-form-item>
+                    <el-form-item label="密码"><el-input v-model="editObj.a_password"></el-input></el-form-item>
                 </el-form>
             </div>
             <span slot="footer" class="dialog-footer">
@@ -55,28 +60,33 @@
 
 </template>
 
+
 <script>
 
-import { getAdministratorInfo } from '@/api/common'
+import { getAdministratorInfo, addAdministrator, deleteAdministrator, updateAdministrator } from '@/api/common'
 
 export default {
     data: function () {
         return {
             userInfo: {
-                id: '',
-                permission: '',
+                a_id: '',
+                a_name: '',
+                a_password: '',
             },
-            tableData: [{
-                id: '001',
-                permission: '管理员',
-            }, {
-                id: '002',
-                permission: '管理员',
-            }],
+            tableData: [],
             dialogVisible: false,
             editObj: {
-                id: '',
-                permission: '',
+                a_id: '',
+                a_name: '',
+                a_password: '',
+            },
+            newinfo: {
+                'a_id': '',
+                'a_name': '',
+                'a_password': '',
+                'new_id': '',
+                'new_name': '',
+                'new_password': '',
             },
             searchId: '', // 查询用的ID
             userIndex: 0,
@@ -90,51 +100,89 @@ export default {
 
         //增加
         addUser() {
-            if (!this.userInfo.id) {
+            if (!this.userInfo.a_id) {
                 this.$message({
-                    message: '请输入用户的ID！',
+                    message: '请输入管理员ID！',
 
                 });
                 return;
             }
-            if (!this.userInfo.permission) {
+            if (!this.userInfo.a_name) {
                 this.$message({
-                    message: '请输入权限！',
+                    message: '请输入姓名！',
                     type: 'warning'
                 });
                 return;
             }
-
-            this.tableData.push(this.userInfo);
+            if (!this.userInfo.a_password) {
+                this.$message({
+                    message: '请输入密码！',
+                    type: 'warning'
+                });
+                return;
+            }
+            // this.tableData.push(this.userInfo);
+            addAdministrator(this.userInfo).then(response => {
+                this.$message({
+                    message: '增加成功！',
+                    type: 'info'
+                });
+                this.fetchAdministratorInfo()
+            }).catch(error => {
+                this.$message({
+                    message: '增加失败！',
+                    type: 'error'
+                });
+            })
             this.userInfo = {
-                id: '',
-                permission: '',
+                a_id: '',
+                a_name: '',
+                a_password: '',
             };
+            this.fetchAdministratorInfo()
         },
 
+
+
         //删除
-        delUser(idx) {
+        delUser(item, idx) {
+            let datainfo = {
+                'a_id': String(item.a_id),
+                'a_name': item.a_name,
+                'a_password': item.a_password,
+            }
             this.$confirm('确认删除此管理员信息？')
                 .then(_ => {
-                    this.tableData.splice(idx, 1);
+                    deleteAdministrator(datainfo).then(response => {
+                        this.$message({
+                            message: '删除成功！',
+                            type: 'info'
+                        })
+                        this.fetchAdministratorInfo()
+                    });
+                }).catch(error => {
+                    this.$message({
+                        message: '删除失败！',
+                        type: 'error'
+                    });
                 })
-                .catch(_ => { });
+            this.fetchAdministratorInfo()
         },
         //修改
         editUser(item, idx) {
-            this.userIndex = idx;
-            this.editObj = {
-                id: item.id,
-                permission: item.permission,
-            };
             this.dialogVisible = true;
+            this.newinfo = {
+                'a_id': String(item.a_id),
+                'a_name': item.a_name,
+                'a_password': item.a_password,
+            };
         },
 
         searchUser() {
             const searchId = this.searchId.trim(); // 去除前后空格
             if (!searchId) {
                 this.$message({
-                    message: '请输入管理员ID进行查询！',
+                    message: '请输入管理员ID或者姓名进行查询！',
                     type: 'warning'
                 });
                 return;
@@ -142,16 +190,15 @@ export default {
 
             let found = false;
             for (let i = 0; i < this.tableData.length; i++) {
-                if (this.tableData[i].id === searchId) {
+                if (this.tableData[i].a_id == searchId || this.tableData[i].a_name == searchId) {
                     this.$message({
-                        message: `找到管理员: ID-${this.tableData[i].id}, 权限-${this.tableData[i].permission}`,
+                        message: `找到管理员: ID-${this.tableData[i].a_id}    姓名-${this.tableData[i].a_name}`,
                         type: 'success'
                     });
                     found = true;
                     break;
                 }
             }
-
             if (!found) {
                 this.$message({
                     message: '未找到该管理员ID！',
@@ -165,12 +212,32 @@ export default {
         },
 
         confirm() {
+            this.newinfo = {
+                'a_id': this.newinfo.a_id,
+                'a_name': this.newinfo.a_name,
+                'a_password': this.newinfo.a_password,
+                'new_id': String(this.editObj.a_id),
+                'new_name': this.editObj.a_name,
+                'new_password': this.editObj.a_password,
+            }
+            updateAdministrator(this.newinfo).then(response => {
+                this.$message({
+                    message: '修改成功！',
+                    type: 'info'
+                });
+                this.fetchAdministratorInfo()
+            }).catch(error => {
+                this.$message({
+                    message: '修改失败！',
+                    type: 'error'
+                });
+            })
+            this.fetchAdministratorInfo()
             this.dialogVisible = false;
-            Vue.set(this.tableData, this.userIndex, this.editObj);
+            // Vue.set(this.tableData, this.userIndex, this.editObj);
         },
 
         fetchAdministratorInfo() {
-            this.moviesLoading = true
             getAdministratorInfo().then(response => {
                 this.tableData = response.data
             })
