@@ -56,6 +56,9 @@
 </template>
 
 <script>
+
+import { getAdministratorInfo } from '@/api/common'
+
 export default {
     data: function () {
         return {
@@ -164,8 +167,18 @@ export default {
         confirm() {
             this.dialogVisible = false;
             Vue.set(this.tableData, this.userIndex, this.editObj);
+        },
+
+        fetchAdministratorInfo() {
+            this.moviesLoading = true
+            getAdministratorInfo().then(response => {
+                this.tableData = response.data
+            })
         }
     },
+    created() {
+        this.fetchAdministratorInfo()
+    }
 }
 </script>
 
