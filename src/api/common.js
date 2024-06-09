@@ -6,3 +6,10 @@ export function getMovieInfo() {
         method: "get"
     })
 }
+
+export function getAdministratorInfo() {
+    return request({
+        url: "/administrator/info",
+        method: "get"
+    })
+}
