@@ -9,7 +9,8 @@ const getDefaultState = () => {
         token: getToken(),
         name: '',
         avatar: '',
-        role: ''
+        role: '',
+        id: ''
     }
 }
 
@@ -30,6 +31,9 @@ const mutations = {
     },
     SET_ROLE: (state, role) => {
         state.role = role
+    },
+    SET_ID: (state, id) => {
+        state.id = id
     }
 }
 
@@ -65,6 +69,7 @@ const actions = {
                 commit('SET_NAME', data.name)
                 commit('SET_AVATAR', data.avatar)
                 commit('SET_ROLE', data.role)
+                commit('SET_ID', data.id)
                 resolve(data)
             }).catch(error => {
                 reject(error)

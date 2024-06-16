@@ -34,5 +34,17 @@ export function updateAdministrator(data) {
         data
     })
 }
+export function getMovieDetails(data) {
+    return request({
+        url: "/movie/details" + "?id=" + data,
+        method: "get"
+    })
+}
 
-
+export function addComment(data) {
+    return request({
+        url: "/movie/details/comment",
+        method: "put",
+        data
+    })
+}
