@@ -3,16 +3,17 @@
         <div class="button">
             <el-button round id="refreshBtn" class="el-icon-refresh" @click="changemovies"></el-button>
         </div>
-        <div class="content" v-loading="moviesLoading">
-            <div class="movie-item" v-for="(movie) in movieList" :key="movie.m_id">
-                <a :href="'http://localhost:9528/#/movie/index?id=' + encodeURIComponent(movie.m_id)">
-                    <img :src="movie.m_img" />
+        <div class="content">
+            <div class="movie-item" v-for="(movie) in movieList">
+                <a class="movie-link">
+                    <img src="movie.m_img" />
                 </a>
                 <div class="name" style="margin:2px;font-size: 16px;">{{ movie.m_name }}</div>
                 <div class="score" style="margin:2px;font-size: 16px;">{{ movie.m_score }}</div>
             </div>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -36,9 +37,6 @@ export default {
                 this.movieList = response.data
                 this.moviesLoading = false
             })
-        },
-        changemovies() {
-            this.fetchMovieInfo()
         }
     }
 };
@@ -71,9 +69,9 @@ export default {
     justify-content: start;
 
     // border: solid;
-    width: 17%;
+    width: 20%;
     max-height: 30%;
-    margin: 5px 15px;
+    margin: 5px;
 }
 
 a {
