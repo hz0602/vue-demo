@@ -7,7 +7,7 @@
             <li v-for="(movie) in movieList" :key="movie.id" class="movie-item">
                 <div class="content">
                     <div class="left">
-                        <a :href="'http://localhost:9528/#/form/index?id=' + encodeURIComponent(movie.m_id)">
+                        <a :href="'http://localhost:9528/#/movie/index?id=' + encodeURIComponent(movie.m_id)">
                             <img :src="movie.m_img" :alt="movie.m_name" class="movie-img">
                         </a>
                         <div class="name">{{ movie.m_name }}</div>
@@ -40,12 +40,19 @@ export default {
                 this.movieList = response.data
                 this.moviesLoading = false
             })
+        },
+        changemovies() {
+            this.fetchMovieInfo()
         }
     }
 };
 </script>
 
 <style lang="less" scoped>
+#refreshBtn {
+    margin-top: 5px;
+}
+
 .Movie {
     width: 100%;
 
@@ -79,8 +86,8 @@ export default {
     }
 
     .movie-img {
-        max-width: 150px;
-        height: 200px;
+        max-width: 120px;
+        height: 160px;
         margin-top: 10px;
         margin-left: 150px;
     }

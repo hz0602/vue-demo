@@ -116,6 +116,7 @@ router.beforeEach(async (to, from, next) => {
                 }
             }
         } else {
+            await store.dispatch('user/getInfo')
             next()
         }
     } else {

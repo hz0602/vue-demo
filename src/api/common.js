@@ -48,3 +48,9 @@ export function addComment(data) {
         data
     })
 }
+export function getcomplaints() {
+    return request({
+        url: "/complaints",
+        method: "get"
+    })
+}

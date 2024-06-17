@@ -2,7 +2,7 @@
   <div class="body">
     <ul>
       <li>
-        <div class="title">电影详情</div>
+        <div class="title"></div>
         <h2 class="nm">{{ movie.m_name }}</h2>
         <div class="content">
           <img class="pic" :src="movie.m_img" />
@@ -34,16 +34,15 @@
           <button @click="submitComment" class="btn">提交评论</button>
         </div>
 
-        <div class="comment_container" v-for="comment in movie.comments">
+        <div class="comment_container" v-for="comment in comments">
           <div>
-            <span class="user-name">{{ comment.username }}</span>
-            <span class="user-time">评分：{{ comment.score }}</span>
+            <span class="user-name">{{ comment.u_name }}</span>
+            <span class="user-time"> {{ comment.r_time }}</span>
           </div>
           <p class="comment_text">
-            {{ comment.comment }}
+            {{ comment.r_content }}
           </p>
           <br>
-
         </div>
       </li>
     </ul>
@@ -58,20 +57,10 @@ export default {
   data() {
     return {
       commentText: "",
+      comments: [],
       movie: {
-        m_name: '环大西洋',
-        m_img: 'https://ts1.cn.mm.bing.net/th/id/R-C.0ca250a867943fcb710771eab74582de?rik=YmGOZ1otcvUxqQ&riu=http%3a%2f%2fvorcdn.xiaodutv.com%2f16640007c22755a60c22797d45d9446a&ehk=QrbkY3JjEp0GwsbZymsX3toy8ucMFLPIRMrYeJx8HzQ%3d&risl=&pid=ImgRaw&r=0',
-        m_director: '贾瑞德·科恩',
-        m_actor: ' 格雷厄姆·格林 / 大卫·乔卡奇 ',
-        m_time: '2013-07-09',
-        m_score: '2.9',
-        m_numratings: '4886',
-        m_encapsulate: '山寨之王The Asylum公司出品的山寨版《环太平洋》',
-        comments: [
-          { username: '蒙古上单', comment: '带你入坑地球online的女玩家退坑了!', score: 5 },
-          { username: '原神玩家', comment: '你爸在庭院种枇杷树', score: 3 }
-        ]
-      }
+      },
+      id: ''
     };
   },
   created() {
@@ -85,27 +74,44 @@ export default {
       // 使用URLSearchParams解析哈希中的查询字符串
       const params = new URLSearchParams(hashSearch);
       // 获取id参数
-      const id = params.get('id');
+      this.id = params.get('id');
 
-      getMovieDetails(id).then(response => {
-        this.movie = {};
-        this.movie = response.data;
+      getMovieDetails(this.id).then(response => {
+        this.movie = response.data.movie;
+        this.comments = response.data.reviews;
       })
+
+
 
     }
   },
   methods: {
     submitComment() {
-      addComment(store.getters.id, this.movie.id, this.commentText).then(response => {
-
-        getMovieDetails(id).then(response => {
-          this.movie = {};
-          this.movie = response.data;
-        })
-
-        this.commentText = "";
+      if (this.commentText.trim() == "") {
+        alert("评论内容不能为空！");
+        return;
       }
-      )
+      let now = new Date();
+      let year = now.getFullYear();
+      let month = now.getMonth() + 1;
+      // month = month < 10 ? '0' + month : month; // 如果月份小于10，则在前面添加一个'0'  
+      let date = now.getDate();
+      // date = date < 10 ? '0' + date : date; // 如果日期小于10，则在前面添加一个'0'  
+      let formattedDate = year + '-' + month + '-' + date;
+      let data = {
+        u_id: store.getters.id,
+        m_id: this.movie.m_id,
+        r_time: formattedDate,
+        r_content: this.commentText
+      }
+      this.commentText = "";
+      addComment(data).then(response => {
+        getMovieDetails(this.id).then(response => {
+          this.movie = response.data.movie;
+          this.comments = response.data.reviews;
+        })
+      })
+
     }
   }
 }
@@ -121,7 +127,7 @@ export default {
   }
 
   .title {
-    background-color: #5c47a8;
+    background-color: #ffffff;
     font-size: 25px;
     width: 100%;
     text-align: center;
@@ -176,6 +182,7 @@ export default {
   .comment_container {
     margin-top: 10px;
     margin-left: 200px;
+    font-size: 18px
   }
 
   .user-name {
@@ -185,13 +192,11 @@ export default {
   .user-time {
     margin-top: 10px;
     margin-left: 10px;
-    font-size: 14px;
     color: rgb(122, 120, 120);
   }
 
   .comment_text {
     margin-top: 10px;
-    font-size: 14px;
     margin-right: 150px;
   }
 
