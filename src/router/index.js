@@ -30,6 +30,12 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+let head = document.getElementsByTagName("head")
+let meta = document.createElement("meta")
+meta.name = 'referrer';
+meta.content = 'no-referrer'
+head[0].appendChild(meta)
+
 export const constantRoutes = [
     {
         path: '/login',
