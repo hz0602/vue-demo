@@ -1,7 +1,8 @@
 <template>
     <div class="Movie">
         <div class="button">
-            <el-button round id="refreshBtn" class="el-icon-refresh" @click="changemovies"></el-button>
+            <el-button round id="refreshBtn" class="el-icon-refresh" @click="changemovies"
+                style="margin-top: 5px; margin-right: 75px;"></el-button>
         </div>
         <div class="content" v-loading="moviesLoading">
             <div class="movie-item" v-for="(movie) in movieList" :key="movie.m_id">
@@ -60,7 +61,6 @@ export default {
 
 .content {
     height: 94%;
-    border: solid;
     display: flex;
     flex-wrap: wrap;
 }
@@ -71,14 +71,12 @@ export default {
     align-items: center;
     justify-content: start;
 
-    // border: solid;
     width: 17%;
     max-height: 30%;
     margin: 5px 15px;
 }
 
 a {
-    // border: solid;
     width: 50%;
     height: 75%;
 }

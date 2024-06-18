@@ -48,9 +48,49 @@ export function addComment(data) {
         data
     })
 }
-export function getcomplaints() {
+export function getComplaints() {
     return request({
         url: "/complaints",
         method: "get"
     })
 }
+export function getComplaintText(data) {
+    return request({
+        url: "/complaint/text" + "?id=" + data,
+        method: "get"
+    })
+}
+export function getMyComplaints(data) {
+    return request({
+        url: "/mycomplaints" + "?u_id=" + data,
+        method: "get"
+    })
+}
+export function submitComplaintReply(data) {
+    return request({
+        url: "/feedback",
+        method: "put",
+        data
+    })
+}
+export function getFeedbacks(data) {
+    return request({
+        url: "/myfeedbacks" + "?c_id=" + data,
+        method: "get"
+    })
+}
+export function get_m_id_byname(data) {
+    return request({
+        url: "/getmid" + "?m_name=" + data,
+        method: "get"
+    })
+}
+export function submitComplaint(data) {
+    return request({
+        url: "/submitcomplaint",
+        method: "put",
+        data
+    })
+}
+
+

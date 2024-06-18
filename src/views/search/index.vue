@@ -3,13 +3,35 @@
         <div class="title">Search Engine</div>
 
         <div class="input">
-            <input type="text" placeholder="hello world" id="search-input">
-            <button id="search-button" onclick="sendRequest()">Search</button>
+            <input v-model="searchText" type="text" placeholder="输入电影名称" id="search-input">
+            <button id="search-button" @click="sendRequest()">Search</button>
         </div>
     </div>
 </template>
 
 <script>
+import { get_m_id_byname } from '@/api/common';
+export default {
+    data: function () {
+        return {
+            searchText: '',
+            aim_id: ''
+        }
+    },
+    methods: {
+        sendRequest() {
+            // if (this.searchText == '') {
+            //     alert('搜索内容不能为空！');
+            //     return;
+            // }
+            get_m_id_byname(this.searchText).then(response => {
+                this.aim_id = Number(response.data);
+                window.location.href = "http://localhost:9528/#/movie/index?id=" + encodeURIComponent(this.aim_id);
+            });
+
+        }
+    }
+}
 </script>
 
 <style lang="less" scoped>
@@ -28,7 +50,7 @@ body {
 
     width: 98%;
     /* height: 650px; */
-    background: #fafafa;
+    background: #ffffff;
     box-sizing: border-box;
     margin-top: 40px;
     margin-left: 1%;

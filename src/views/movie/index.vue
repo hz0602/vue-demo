@@ -19,7 +19,6 @@
             <p>评分人次: {{ movie.m_numratings }}</p>
           </div>
         </div>
-
         <div class="detail">
           <div class="jianjie">{{ movie.m_name }}的剧情简介······</div>
           <div class="text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ movie.m_encapsulate }}</div>
@@ -28,12 +27,17 @@
         <div class="detail">
           <div class="jianjie">{{ movie.m_name }}的短评······<br>
           </div>
+          <div class="giveScore">
+            <span v-for="index in 5" :key="index" @click="toggleStar(index)" class="star">
+              <i v-if="index <= score" class="el-icon-star-off" style="font-size: 40px;"></i>
+              <i v-else class="el-icon-star-on" style="font-size: 40px;"></i>
+            </span>
+          </div>
         </div>
         <div>
           <textarea v-model="commentText" placeholder="写下你的评论..." rows="3" class="com"></textarea>
           <button @click="submitComment" class="btn">提交评论</button>
         </div>
-
         <div class="comment_container" v-for="comment in comments">
           <div>
             <span class="user-name">{{ comment.u_name }}</span>
@@ -60,7 +64,8 @@ export default {
       comments: [],
       movie: {
       },
-      id: ''
+      id: '',
+      score: 0
     };
   },
   created() {
@@ -79,6 +84,9 @@ export default {
       getMovieDetails(this.id).then(response => {
         this.movie = response.data.movie;
         this.comments = response.data.reviews;
+        this.comments.forEach(item => {
+          item.r_time = item.r_time.slice(0, -2);
+        });
       })
 
 
@@ -86,9 +94,16 @@ export default {
     }
   },
   methods: {
+    toggleStar(index) {
+      this.score = index;
+    },
     submitComment() {
       if (this.commentText.trim() == "") {
         alert("评论内容不能为空！");
+        return;
+      }
+      if (this.score == 0) {
+        alert("请给电影评分！");
         return;
       }
       let now = new Date();
@@ -96,19 +111,26 @@ export default {
       let month = now.getMonth() + 1;
       // month = month < 10 ? '0' + month : month; // 如果月份小于10，则在前面添加一个'0'  
       let date = now.getDate();
+      let hour = now.getHours();
+      let minute = now.getMinutes();
+      let second = now.getSeconds();
       // date = date < 10 ? '0' + date : date; // 如果日期小于10，则在前面添加一个'0'  
-      let formattedDate = year + '-' + month + '-' + date;
+      let formattedDate = year + '-' + month + '-' + date + ' ' + hour + ':' + minute + ':' + second;
       let data = {
         u_id: store.getters.id,
         m_id: this.movie.m_id,
         r_time: formattedDate,
-        r_content: this.commentText
+        r_content: this.commentText,
+        r_score: this.score * 2
       }
       this.commentText = "";
       addComment(data).then(response => {
         getMovieDetails(this.id).then(response => {
           this.movie = response.data.movie;
           this.comments = response.data.reviews;
+          this.comments.forEach(item => {
+            item.r_time = item.r_time.slice(0, -2);
+          });
         })
       })
 
@@ -118,6 +140,13 @@ export default {
 </script>
 
 <style scoped>
+.star:hover {
+  cursor: pointer;
+  /* 悬停时的光标形状，使用自定义图片 */
+  /* 或者使用标准的光标形状，如 'grab'、'grabbing'、'crosshair' 等 */
+  /* cursor: grab; */
+}
+
 .body {
   width: 100%;
 

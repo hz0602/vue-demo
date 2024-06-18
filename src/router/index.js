@@ -105,7 +105,7 @@ export const constantRoutes = [
                 path: 'index',
                 name: 'search',
                 component: () => import('@/views/search/index'),
-                meta: { title: '搜索电影', icon: 'link' }
+                meta: { title: '搜索电影', icon: 'eye' }
             }
         ]
     },
@@ -119,10 +119,16 @@ export const constantRoutes = [
                 path: 'index',
                 name: 'Complaint',
                 component: () => import('@/views/complaint/index'),
-                meta: { title: '投诉', icon: 'link' }
+                meta: { title: '投诉', icon: 'form' }
             }
         ]
     },
+    {
+        path: '/complaintdetails/index',
+        component: () => import('@/views/complaintdetails/index'),
+        hidden: true,
+    },
+
 
     // 404 page must be placed at the end !!!
     { path: '*', redirect: '/404', hidden: true }
