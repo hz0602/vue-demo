@@ -105,7 +105,10 @@ export default {
         },
         addcomplaint() {
             if (this.new_complaint == '') {
-                alert('投诉内容不能为空！');
+                this.$message({
+                    message: '投诉内容不能为空！',
+                    type: 'warning'
+                });
                 return;
             }
             let now = new Date();

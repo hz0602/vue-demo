@@ -1,7 +1,10 @@
 <template>
     <div id="app">
         <button class="zhuxiao-button" @click="logout">注销</button>
-
+        <div class="name">
+            <br>
+            <span>欢迎，总管：{{ s_name }}</span>
+        </div>
         <div class="head">
             <el-row :gutter="20">
                 <el-col :span="6">
@@ -64,6 +67,7 @@
 <script>
 
 import { getAdministratorInfo, addAdministrator, deleteAdministrator, updateAdministrator } from '@/api/common'
+import store from '@/store';
 
 export default {
     data: function () {
@@ -89,7 +93,7 @@ export default {
                 'new_password': '',
             },
             searchId: '', // 查询用的ID
-            userIndex: 0,
+            s_name: store.getters.name, // 总管名
         }
     },
     methods: {
@@ -103,7 +107,7 @@ export default {
             if (!this.userInfo.a_id) {
                 this.$message({
                     message: '请输入管理员ID！',
-
+                    type: 'warning'
                 });
                 return;
             }

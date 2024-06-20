@@ -93,4 +93,46 @@ export function submitComplaint(data) {
     })
 }
 
+export function get_m_name_byname(data) {
+    return request({
+        url: "/getmname" + "?m_name=" + data,
+        method: "get"
+    })
+}
+export function collectMovie(data) {
+    return request({
+        url: "/movie/collect",
+        method: "put",
+        data
+    })
+}
+export function initc_status(data) {
+    return request({
+        url: "/movie/is_collect",
+        method: "post",
+        data
+    })
+}
+
+export function getCollectionInfo(data) {
+    return request({
+        url: "/movie/collection" + "?u_id=" + data,
+        method: "get"
+    })
+}
+export function updateHistory(data) {
+    return request({
+        url: "/writehistory",
+        method: "put",
+        data
+    })
+}
+export function getHistoryInfo(data) {
+    return request({
+        url: "/historyinfo" + "?u_id=" + data,
+        method: "get"
+    })
+}
+
+
 

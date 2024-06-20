@@ -1,7 +1,10 @@
 <template>
     <div id="app">
+        <div class="name">
+            <br>
+            <span>欢迎，管理员：{{ a_name }}</span>
+        </div>
         <button class="zhuxiao-button" @click="logout">注销</button>
-
         <div class="body">
             <el-table :data="tableData" style="width: 100%">
                 <el-table-column label="序号" width="180"><template slot-scope="scope"> {{ scope.$index + 1 }}
@@ -28,6 +31,7 @@
 <script>
 
 import { getComplaints } from '@/api/common'
+import store from '@/store';
 
 export default {
     data: function () {
@@ -41,7 +45,7 @@ export default {
                 }
             ],
             complaint_id: '', // 投诉ID
-            userIndex: 0,
+            a_name: store.getters.name,
         }
     },
     methods: {

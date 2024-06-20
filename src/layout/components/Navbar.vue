@@ -3,13 +3,15 @@
 <template>
     <div class="navbar">
         <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-
         <breadcrumb class="breadcrumb-container" />
         <div class="right-menu">
+            <div class="username" style="margin-top: 4px;margin-right: 10px;">
+                {{ username }}
+            </div>
             <el-dropdown class="avatar-container" trigger="click">
                 <div class="avatar-wrapper">
                     <!-- <img :src="avatar + '?imageView2/1/w/80/h/80'" class="user-avatar"> -->
-                    <button>选 项</button>
+                    <el-button>选 项</el-button>
                     <i class="el-icon-caret-bottom" />
                 </div>
                 <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -26,6 +28,7 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import store from '@/store';
 
 export default {
     components: {
@@ -37,6 +40,11 @@ export default {
             'sidebar',
             'avatar'
         ])
+    },
+    data() {
+        return {
+            username: store.getters.name
+        }
     },
     methods: {
         toggleSideBar() {
@@ -85,6 +93,8 @@ export default {
         float: right;
         height: 100%;
         line-height: 50px;
+        display: flex;
+        justify-content: space-between;
 
         &:focus {
             outline: none;

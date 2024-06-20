@@ -1,47 +1,72 @@
 <template>
     <div class="app">
-        <div class="title">Search Engine</div>
+        <div class="title">Search</div>
 
         <div class="input">
-            <input v-model="searchText" type="text" placeholder="输入电影名称" id="search-input">
-            <button id="search-button" @click="sendRequest()">Search</button>
+            <input v-model="searchText" type="text" placeholder="输入电影名称" id="search-input " @input="findResults">
+            <button id=" search-button" @click="sendRequest">Search</button>
+        </div>
+
+        <div class="results-dropdown">
+            <div v-for="(result, index) in searchResults" :key="index" style="margin: 15px 0px; cursor: pointer;"
+                @click="sendRequest1(searchResults[index])">
+                {{ result }}
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-import { get_m_id_byname } from '@/api/common';
+import { get_m_id_byname, get_m_name_byname } from '@/api/common';
 export default {
     data: function () {
         return {
+            showResults: true,
+            searchResults: [
+            ],
             searchText: '',
             aim_id: ''
         }
     },
     methods: {
         sendRequest() {
-            // if (this.searchText == '') {
-            //     alert('搜索内容不能为空！');
-            //     return;
-            // }
+            if (this.searchText == '') {
+                return;
+            }
             get_m_id_byname(this.searchText).then(response => {
                 this.aim_id = Number(response.data);
                 window.location.href = "http://localhost:9528/#/movie/index?id=" + encodeURIComponent(this.aim_id);
             });
 
+        },
+        sendRequest1(s_text) {
+            get_m_id_byname(s_text).then(response => {
+                this.aim_id = Number(response.data);
+                window.location.href = "http://localhost:9528/#/movie/index?id=" + encodeURIComponent(this.aim_id);
+            });
+
+        },
+        findResults() {
+            // alert(this.searchText);
+            if (this.searchText.trim() == '') {
+
+                this.searchResults = [];
+                return;
+            }
+
+            get_m_name_byname(this.searchText).then(response => {
+                this.searchResults = response.data;
+                if (this.searchText.trim() == '') {
+                    this.searchResults = [];
+                }
+                console.log(this.searchResults);
+            });
         }
     }
 }
 </script>
 
 <style lang="less" scoped>
-body {
-    background:
-        linear-gradient(to right,
-            rgb(113, 65, 168),
-            rgb(44, 114, 251));
-}
-
 .app {
     display: flex;
     flex-direction: column;
@@ -90,5 +115,9 @@ button {
     color: aliceblue;
     border-radius: 0 25px 25px 0;
     cursor: pointer;
+}
+
+.results-dropdown {
+    width: 38%;
 }
 </style>

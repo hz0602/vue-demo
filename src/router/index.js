@@ -128,6 +128,30 @@ export const constantRoutes = [
         component: () => import('@/views/complaintdetails/index'),
         hidden: true,
     },
+    {
+        path: '/collection',
+        component: Layout,
+        children: [
+            {
+                path: 'index',
+                name: 'collection',
+                component: () => import('@/views/collection/index'),
+                meta: { title: '我的收藏', icon: 'user' }
+            }
+        ]
+    },
+    {
+        path: '/history',
+        component: Layout,
+        children: [
+            {
+                path: 'index',
+                name: 'history',
+                component: () => import('@/views/history/index'),
+                meta: { title: '我的足迹', icon: 'link' }
+            }
+        ]
+    },
 
 
     // 404 page must be placed at the end !!!

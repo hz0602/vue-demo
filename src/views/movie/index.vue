@@ -11,6 +11,9 @@
             <p>导演: {{ movie.m_director }}</p>
             <p>主演: {{ movie.m_actor }}</p>
             <p>上映日期: {{ movie.m_time }}</p>
+            <a :href="urlink">
+              <p style="  color: #116afad6 ;font-size: 18px;margin-top: 10px;">点击观看</p>
+            </a>
           </div>
 
           <div class="pingfen">
@@ -18,10 +21,20 @@
             <p class="score">评分 {{ movie.m_score }}</p>
             <p>评分人次: {{ movie.m_numratings }}</p>
           </div>
+          <div class="collect">
+            <p v-if="!is_collected" class="el-icon-star-off"
+              style="font-size: 40px;margin-top: 20px;margin-left: 15px;color: #ffA500;cursor: pointer;"
+              @click="collect(true)"></p>
+            <p v-else class="el-icon-star-on"
+              style="font-size: 40px;margin-top: 20px;margin-left: 15px;color: #ffA500;cursor: pointer"
+              @click="collect(false)">
+            </p>
+          </div>
         </div>
         <div class="detail">
           <div class="jianjie">{{ movie.m_name }}的剧情简介······</div>
-          <div class="text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ movie.m_encapsulate }}</div>
+          <div class="text" style="line-height: 1.5;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ movie.m_encapsulate
+            }}</div>
         </div>
 
         <div class="detail">
@@ -42,6 +55,7 @@
           <div>
             <span class="user-name">{{ comment.u_name }}</span>
             <span class="user-time"> {{ comment.r_time }}</span>
+            <span style="margin-left: 10px;color: #008b00"> 评分：{{ comment.r_score }}</span>
           </div>
           <p class="comment_text">
             {{ comment.r_content }}
@@ -55,7 +69,7 @@
 </template>
 
 <script>
-import { getMovieDetails, addComment } from '@/api/common';
+import { getMovieDetails, addComment, collectMovie, initc_status, updateHistory } from '@/api/common';
 import store from '@/store';
 export default {
   data() {
@@ -65,7 +79,9 @@ export default {
       movie: {
       },
       id: '',
-      score: 0
+      score: 0,
+      urlink: '',
+      is_collected: false
     };
   },
   created() {
@@ -82,12 +98,33 @@ export default {
       this.id = params.get('id');
 
       getMovieDetails(this.id).then(response => {
+
+        let now = new Date();
+        let year = now.getFullYear();
+        let month = now.getMonth() + 1;
+        // month = month < 10 ? '0' + month : month; // 如果月份小于10，则在前面添加一个'0'  
+        let date = now.getDate();
+        let hour = now.getHours();
+        let minute = now.getMinutes();
+        let second = now.getSeconds();
+        // date = date < 10 ? '0' + date : date; // 如果日期小于10，则在前面添加一个'0'  
+        let formattedDate = year + '-' + month + '-' + date + ' ' + hour + ':' + minute + ':' + second;
+        let data = {
+          u_id: store.getters.id,
+          m_id: this.id,
+          h_time: formattedDate
+        }
+        updateHistory(data).then(response => { })
         this.movie = response.data.movie;
+        this.urlink = response.data.movie.m_link;
+        // console.log(this.urlink);
         this.comments = response.data.reviews;
         this.comments.forEach(item => {
           item.r_time = item.r_time.slice(0, -2);
         });
+        this.initcollect();
       })
+
 
 
 
@@ -97,13 +134,39 @@ export default {
     toggleStar(index) {
       this.score = index;
     },
+    collect(flag) {
+      let data = {
+        u_id: store.getters.id,
+        m_id: this.movie.m_id,
+        is_collect: flag
+      }
+      collectMovie(data).then(response => {
+        this.initcollect();
+      })
+    },
+    initcollect() {
+      let data = {
+        u_id: store.getters.id,
+        m_id: this.movie.m_id,
+      }
+      initc_status(data).then(response => {
+        this.is_collected = response.data;
+      })
+
+    },
     submitComment() {
       if (this.commentText.trim() == "") {
-        alert("评论内容不能为空！");
+        this.$message({
+          message: '评论内容不能为空！',
+          type: 'warning'
+        });
         return;
       }
       if (this.score == 0) {
-        alert("请给电影评分！");
+        this.$message({
+          message: '请给电影评分！',
+          type: 'warning'
+        });
         return;
       }
       let now = new Date();
@@ -126,8 +189,11 @@ export default {
       this.commentText = "";
       addComment(data).then(response => {
         getMovieDetails(this.id).then(response => {
+
+
           this.movie = response.data.movie;
           this.comments = response.data.reviews;
+          this.urlink = response.data.movie.m_link;
           this.comments.forEach(item => {
             item.r_time = item.r_time.slice(0, -2);
           });
